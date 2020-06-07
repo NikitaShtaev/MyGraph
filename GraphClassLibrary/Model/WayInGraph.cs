@@ -1,36 +1,26 @@
 ﻿
-using System.Collections.Generic;
-
 namespace GraphClassLibrary.Model
 {
     public class WayInGraph
     {
-        public Queue<Vertex> Way { get; set; }
-        public decimal WayLength { get; set; }
-        public WayInGraph()
+        public decimal [] MinWayWeights { get; set; }
+        public decimal MaxWayLength { get; set; }
+        public WayInGraph(int size, decimal maxWayLength)
         {
-            Way = new Queue<Vertex>();
-        }
-        private void AddVertex (Vertex vertex)
-        {
-            if (!Way.Contains(vertex))
+            MaxWayLength = maxWayLength;
+            MinWayWeights = new decimal[size];
+            for (int i = 1; i < size; i++)
             {
-                Way.Enqueue(vertex);
+                MinWayWeights[i] = maxWayLength;
             }
-        }
-        public void IncreaseWay(Edge edge)
-        {
-            AddVertex(edge.From);
-            AddVertex(edge.To);
-            //Way.Add(edge.To);
-            WayLength += edge.Weight;
         }
         public override string ToString()
         {
             var result = "";
-            foreach (var vertex in Way)
+            for (int i = 0; i < MinWayWeights.Length; i++)
             {
-                result += $"{vertex} ";
+                if (MinWayWeights[i] != 0 && MinWayWeights[i] != MaxWayLength)
+                result += $"To[{i}]:{MinWayWeights[i]} ";
             }
             return result;
         }

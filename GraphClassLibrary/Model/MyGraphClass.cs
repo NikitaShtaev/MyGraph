@@ -1,6 +1,5 @@
 ﻿
 using GraphClassLibrary.Model;
-using System;
 using System.Collections.Generic;
 
 namespace GraphClassLibrary
@@ -32,94 +31,64 @@ namespace GraphClassLibrary
             Edges = new List<Edge>();
         }
         /// <summary>
-        /// Generate graph as matrix.
+        /// Returns all shortest ways from current vertex till all others.
         /// </summary>
+        /// <param name="start"></param>
+        /// <param name="finish"></param>
         /// <returns></returns>
-        private decimal[,] GetGraphMatrix()
+        public WayInGraph GetWaysSpecial(Vertex start)
         {
-            var matrix = new decimal[CountVertexes, CountVertexes];
-            for (int i = 0; i < CountVertexes; i++)
+            var way = new WayInGraph(CountVertexes, GetMaxLength());
+            way.MinWayWeights[start.Number] = 0;
+            for (int i = start.Number; i < CountVertexes; i++)
             {
-                for (int j = 0; j < CountVertexes; j++)
+                foreach (var edge in GetConnectedEdges(Vertexes[i], Edges))
                 {
-                    var checkVertex1 = new Vertex(i);
-                    var checkVertex2 = new Vertex(j);
-                    foreach (var edge in Edges)
+                    if (way.MinWayWeights[edge.To.Number] > way.MinWayWeights[edge.From.Number] + edge.Weight)
                     {
-                        if (edge.From == checkVertex1 && edge.To == checkVertex2)
-                        {
-                            matrix[i, j] = edge.Weight;
-                        }
-                        if (i == j)
-                        {
-                            matrix[i, j] = i;
-                        }
+                        way.MinWayWeights[edge.To.Number] = way.MinWayWeights[edge.From.Number] + edge.Weight;
                     }
                 }
             }
-            return matrix;
+            return way;
         }
         /// <summary>
-        /// Adding new vertex if it still doesn't exist in graph. 
+        /// Returns all shortest ways from head vertex till all others.
         /// </summary>
-        /// <param name="newVertex"></param>
-        private void AddVertex(Vertex newVertex)
-        {
-            if (!Vertexes.Contains(newVertex))
-            {
-                Vertexes.Add(newVertex);
-            }
-        }
-        /// <summary>
-        /// Checking if there is edge with vertex as vertex[edge.from].
-        /// </summary>
-        /// <param name="CheckingEdge"></param>
-        /// <param name="CheckingVertex"></param>
+        /// <param name="start"></param>
+        /// <param name="finish"></param>
         /// <returns></returns>
-        private bool CheckVertexInEdge(Edge CheckingEdge, Vertex CheckingVertex)
+        public WayInGraph GetWaysFromHead()
         {
-            if (CheckingEdge.From == CheckingVertex)
+            var way = new WayInGraph(CountVertexes, GetMaxLength());
+            foreach (var vertex in Vertexes)
             {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        /// <summary>
-        /// Returns Queue of vertexes that connected to current vertex.
-        /// </summary>
-        /// <param name="vertex"></param>
-        /// <returns></returns>
-        private Queue<Vertex> GetConnectedVertexes(Vertex vertex)
-        {
-            var result = new Queue<Vertex>();
-            foreach (var edge in Edges)
-            {
-                if (CheckVertexInEdge(edge, vertex))
+                foreach (var edge in GetConnectedEdges(vertex, Edges))
                 {
-                    result.Enqueue(edge.To);
+                    if (way.MinWayWeights[edge.To.Number] > way.MinWayWeights[edge.From.Number] + edge.Weight)
+                    {
+                        way.MinWayWeights[edge.To.Number] = way.MinWayWeights[edge.From.Number] + edge.Weight;
+                    }
                 }
             }
-            return result;
+            return way;
         }
         /// <summary>
-        /// Returns Queue of edges that connected to current vertex.
+        /// Returns edge with min way from current list of edges.
         /// </summary>
-        /// <param name="vertex"></param>
+        /// <param name="currentEdges"></param>
         /// <returns></returns>
-        private Queue<Edge> GetConnectedEdges(Vertex vertex)
+        private Edge GetMinEdge(List<Edge> currentEdges)
         {
-            var result = new Queue<Edge>();
-            foreach (var edge in Edges)
+            var min = currentEdges[0];
+            foreach (var edge in currentEdges)
             {
-                if (CheckVertexInEdge(edge, vertex))
+                if (edge.Weight < min.Weight)
                 {
-                    result.Enqueue(edge);
+                    min = edge;
                 }
             }
-            return result;
+            return min;
         }
         /// <summary>
         /// Adding edge to graph, if it still doesn't exist in graph. And adding vertexes FROM and TO if they still doesn't exist in graph. 
@@ -180,6 +149,108 @@ namespace GraphClassLibrary
             }
             return result;
         }
-
+        /// <summary>
+        /// Generate graph as matrix.
+        /// </summary>
+        /// <returns></returns>
+        private decimal[,] GetGraphMatrix()
+        {
+            var matrix = new decimal[CountVertexes, CountVertexes];
+            for (int i = 0; i < CountVertexes; i++)
+            {
+                for (int j = 0; j < CountVertexes; j++)
+                {
+                    var checkVertex1 = new Vertex(i);
+                    var checkVertex2 = new Vertex(j);
+                    foreach (var edge in Edges)
+                    {
+                        if (edge.From == checkVertex1 && edge.To == checkVertex2)
+                        {
+                            matrix[i, j] = edge.Weight;
+                        }
+                        //if (i == j)
+                        //{
+                        //    matrix[i, j] = i;
+                        //}
+                    }
+                }
+            }
+            return matrix;
+        }
+        /// <summary>
+        /// Adding new vertex if it still doesn't exist in graph. 
+        /// </summary>
+        /// <param name="newVertex"></param>
+        private void AddVertex(Vertex newVertex)
+        {
+            if (!Vertexes.Contains(newVertex))
+            {
+                Vertexes.Add(newVertex);
+            }
+        }
+        /// <summary>
+        /// Checking if there is edge with vertex as vertex[edge.from].
+        /// </summary>
+        /// <param name="CheckingEdge"></param>
+        /// <param name="CheckingVertex"></param>
+        /// <returns></returns>
+        private bool CheckVertexInEdge(Edge CheckingEdge, Vertex CheckingVertex)
+        {
+            if (CheckingEdge.From == CheckingVertex)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        /// <summary>
+        /// Returns List of vertexes that connected to current vertex.
+        /// </summary>
+        /// <param name="vertex"></param>
+        /// <returns></returns>
+        private List<Vertex> GetConnectedVertexes(Vertex vertex)
+        {
+            var result = new List<Vertex>();
+            foreach (var edge in Edges)
+            {
+                if (CheckVertexInEdge(edge, vertex))
+                {
+                    result.Add(edge.To);
+                }
+            }
+            return result;
+        }
+        /// <summary>
+        /// Returns List of edges that connected to current vertex.
+        /// </summary>
+        /// <param name="vertex"></param>
+        /// <returns></returns>
+        private List<Edge> GetConnectedEdges(Vertex vertex, List<Edge> edges)
+        {
+            var result = new List<Edge>();
+            foreach (var edge in edges)
+            {
+                if (CheckVertexInEdge(edge, vertex))
+                {
+                    result.Add(edge);
+                }
+            }
+            return result;
+        }
+        /// <summary>
+        /// Returns maximum possible value for way length.
+        /// </summary>
+        /// <returns></returns>
+        private decimal GetMaxLength()
+        {
+            decimal max = 0;
+            foreach (var item in Edges)
+            {
+                max += item.Weight;
+            }
+            return max;
+        }
     }
 }
