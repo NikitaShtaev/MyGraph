@@ -53,6 +53,29 @@ namespace GraphClassLibrary
             return way;
         }
         /// <summary>
+        /// Returns way from start to finish as List of vertexes.
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="finish"></param>
+        /// <returns></returns>
+        private List<Vertex> GetWay(Vertex start, Vertex finish)
+        {
+            var way = new WayInGraph(CountVertexes, GetMaxLength());
+            way.MinWayWeights[start.Number] = 0;
+            for (int i = start.Number; i < CountVertexes; i++)
+            {
+                foreach (var edge in GetConnectedEdges(Vertexes[i], Edges))
+                {
+                    if (way.MinWayWeights[edge.To.Number] > way.MinWayWeights[edge.From.Number] + edge.Weight)
+                    {
+                        way.MinWayWeights[edge.To.Number] = way.MinWayWeights[edge.From.Number] + edge.Weight;
+                        way.PreviousVertexes[edge.To.Number] = edge.From;
+                    }
+                }
+            }
+            return way.GetWayFromPreviousVertexes(start, finish);
+        }
+        /// <summary>
         /// Returns all shortest ways from head vertex till all others.
         /// </summary>
         /// <param name="start"></param>
@@ -105,6 +128,16 @@ namespace GraphClassLibrary
             AddVertex(edge.From);
             AddVertex(edge.To);
         }
+        public string GetWayFromTo(Vertex start, Vertex finish)
+        {
+            var result = "";
+            result += $"Length:{GetWaysSpecial(start).MinWayWeights[finish.Number]} ";
+            foreach (var vertex in GetWay(start, finish))
+            {
+                result += $"-{vertex}-";
+            }
+            return result;
+        }
         /// <summary>
         /// Return string with all vertexes in graph.
         /// </summary>
@@ -156,24 +189,9 @@ namespace GraphClassLibrary
         private decimal[,] GetGraphMatrix()
         {
             var matrix = new decimal[CountVertexes, CountVertexes];
-            for (int i = 0; i < CountVertexes; i++)
+            foreach (var edge in Edges)
             {
-                for (int j = 0; j < CountVertexes; j++)
-                {
-                    var checkVertex1 = new Vertex(i);
-                    var checkVertex2 = new Vertex(j);
-                    foreach (var edge in Edges)
-                    {
-                        if (edge.From == checkVertex1 && edge.To == checkVertex2)
-                        {
-                            matrix[i, j] = edge.Weight;
-                        }
-                        //if (i == j)
-                        //{
-                        //    matrix[i, j] = i;
-                        //}
-                    }
-                }
+                matrix[edge.From.Number, edge.To.Number] = edge.Weight;
             }
             return matrix;
         }
