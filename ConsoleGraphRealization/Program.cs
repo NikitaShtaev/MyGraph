@@ -15,49 +15,24 @@ namespace ConsoleGraphRealization
             var v3 = new Vertex(3);
             var v4 = new Vertex(4);
             var v5 = new Vertex(5);
-            var v6 = new Vertex(6);
-            var v7 = new Vertex(7);
-            var v8 = new Vertex(8);
 
-            //AddTwoWayEdgeToGraph(graph, v0, v1, 7); //1
-            //AddTwoWayEdgeToGraph(graph, v0, v2, 1); //2
-            //AddTwoWayEdgeToGraph(graph, v0, v3, 4); //3
-            //AddTwoWayEdgeToGraph(graph, v1, v4, 8); //4
-            //AddTwoWayEdgeToGraph(graph, v1, v2, 1); //5
-            //AddTwoWayEdgeToGraph(graph, v2, v4, 7); //6
-            //AddTwoWayEdgeToGraph(graph, v2, v5, 6); //7
-            //AddTwoWayEdgeToGraph(graph, v3, v6, 5); //8
-            //AddTwoWayEdgeToGraph(graph, v4, v7, 3); //9
-            //AddTwoWayEdgeToGraph(graph, v4, v5, 2); //10
-            //AddTwoWayEdgeToGraph(graph, v5, v6, 4); //11
-            //AddTwoWayEdgeToGraph(graph, v6, v8, 7); //12
-            //AddTwoWayEdgeToGraph(graph, v5, v3, 3); //13
-            //AddTwoWayEdgeToGraph(graph, v5, v7, 1); //14
-            //AddTwoWayEdgeToGraph(graph, v2, v6, 2); //15
-
-            AddOneWayEdgeToGraph(graph, v0, v1, 7); //1
-            AddOneWayEdgeToGraph(graph, v0, v2, 1); //2
-            AddOneWayEdgeToGraph(graph, v0, v3, 4); //3
-            AddOneWayEdgeToGraph(graph, v1, v4, 8); //4
-            AddOneWayEdgeToGraph(graph, v1, v2, 1); //5
-            AddOneWayEdgeToGraph(graph, v2, v4, 7); //6
-            AddOneWayEdgeToGraph(graph, v2, v5, 6); //7
-            AddOneWayEdgeToGraph(graph, v3, v6, 5); //8
-            AddOneWayEdgeToGraph(graph, v4, v7, 3); //9
-            AddOneWayEdgeToGraph(graph, v4, v5, 2); //10
-            AddOneWayEdgeToGraph(graph, v5, v6, 4); //11
-            AddOneWayEdgeToGraph(graph, v6, v8, 7); //12
-            AddOneWayEdgeToGraph(graph, v5, v3, 3); //13
-            AddOneWayEdgeToGraph(graph, v5, v7, 1); //14
-            AddOneWayEdgeToGraph(graph, v2, v6, 2); //15
+            AddOneWayEdgeToGraph(graph, v0, v1, 4); //1
+            AddOneWayEdgeToGraph(graph, v1, v0, 4); //2
+            AddOneWayEdgeToGraph(graph, v0, v2, 3); //1
+            AddOneWayEdgeToGraph(graph, v0, v3, 1); //3
+            AddOneWayEdgeToGraph(graph, v1, v2, 6); //4
+            AddOneWayEdgeToGraph(graph, v2, v4, 3); //5
+            AddOneWayEdgeToGraph(graph, v2, v5, 1); //6
+            AddOneWayEdgeToGraph(graph, v3, v4, 1); //7
+            AddOneWayEdgeToGraph(graph, v4, v5, 1); //8
+            AddOneWayEdgeToGraph(graph, v5, v4, 4); //9
 
             Console.WriteLine(graph.GetVertexesAsString());
             Console.WriteLine(graph.GetEdgesAsString());
             Console.WriteLine(graph);
 
-            Console.WriteLine(graph.GetWaysFromHead());
-            Console.WriteLine(graph.GetWayFromTo(v1, v7));
-            Console.WriteLine(graph.GetWaysSpecial(v1));
+            Console.WriteLine("=====================");
+            Console.WriteLine(graph.GetWayFromTo(v0, v5));
             Console.ReadLine();
         }
         static void AddTwoWayEdgeToGraph(MyGraphClass graph, Vertex v1, Vertex v2, int weight)

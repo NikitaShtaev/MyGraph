@@ -31,158 +31,6 @@ namespace GraphClassLibrary
             Edges = new List<Edge>();
         }
         /// <summary>
-        /// Returns all shortest ways from current vertex till all others.
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="finish"></param>
-        /// <returns></returns>
-        public WayInGraph GetWaysSpecial(Vertex start)
-        {
-            var way = new WayInGraph(CountVertexes, GetMaxLength());
-            way.MinWayWeights[start.Number] = 0;
-            for (int i = start.Number; i < CountVertexes; i++)
-            {
-                foreach (var edge in GetConnectedEdges(Vertexes[i], Edges))
-                {
-                    if (way.MinWayWeights[edge.To.Number] > way.MinWayWeights[edge.From.Number] + edge.Weight)
-                    {
-                        way.MinWayWeights[edge.To.Number] = way.MinWayWeights[edge.From.Number] + edge.Weight;
-                    }
-                }
-            }
-            return way;
-        }
-        /// <summary>
-        /// Returns way from start to finish as List of vertexes.
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="finish"></param>
-        /// <returns></returns>
-        private List<Vertex> GetWay(Vertex start, Vertex finish)
-        {
-            var way = new WayInGraph(CountVertexes, GetMaxLength());
-            way.MinWayWeights[start.Number] = 0;
-            for (int i = start.Number; i < CountVertexes; i++)
-            {
-                foreach (var edge in GetConnectedEdges(Vertexes[i], Edges))
-                {
-                    if (way.MinWayWeights[edge.To.Number] > way.MinWayWeights[edge.From.Number] + edge.Weight)
-                    {
-                        way.MinWayWeights[edge.To.Number] = way.MinWayWeights[edge.From.Number] + edge.Weight;
-                        way.PreviousVertexes[edge.To.Number] = edge.From;
-                    }
-                }
-            }
-            return way.GetWayFromPreviousVertexes(start, finish);
-        }
-        /// <summary>
-        /// Returns all shortest ways from head vertex till all others.
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="finish"></param>
-        /// <returns></returns>
-        public WayInGraph GetWaysFromHead()
-        {
-            var way = new WayInGraph(CountVertexes, GetMaxLength());
-            foreach (var vertex in Vertexes)
-            {
-                foreach (var edge in GetConnectedEdges(vertex, Edges))
-                {
-                    if (way.MinWayWeights[edge.To.Number] > way.MinWayWeights[edge.From.Number] + edge.Weight)
-                    {
-                        way.MinWayWeights[edge.To.Number] = way.MinWayWeights[edge.From.Number] + edge.Weight;
-                    }
-                }
-            }
-            return way;
-        }
-        /// <summary>
-        /// Returns edge with min way from current list of edges.
-        /// </summary>
-        /// <param name="currentEdges"></param>
-        /// <returns></returns>
-        private Edge GetMinEdge(List<Edge> currentEdges)
-        {
-            var min = currentEdges[0];
-            foreach (var edge in currentEdges)
-            {
-                if (edge.Weight < min.Weight)
-                {
-                    min = edge;
-                }
-            }
-            return min;
-        }
-        /// <summary>
-        /// Adding edge to graph, if it still doesn't exist in graph. And adding vertexes FROM and TO if they still doesn't exist in graph. 
-        /// </summary>
-        /// <param name="from"></param>
-        /// <param name="to"></param>
-        /// <param name="weight"></param>
-        public void AddEdge(Edge edge)
-        {
-            if (!Edges.Contains(edge))
-            {
-                Edges.Add(edge);
-            }
-            AddVertex(edge.From);
-            AddVertex(edge.To);
-        }
-        public string GetWayFromTo(Vertex start, Vertex finish)
-        {
-            var result = "";
-            result += $"Length:{GetWaysSpecial(start).MinWayWeights[finish.Number]} ";
-            foreach (var vertex in GetWay(start, finish))
-            {
-                result += $"-{vertex}-";
-            }
-            return result;
-        }
-        /// <summary>
-        /// Return string with all vertexes in graph.
-        /// </summary>
-        /// <returns></returns>
-        public string GetVertexesAsString()
-        {
-            var result = "";
-            for(var i =0; i < CountVertexes; i++)
-            {
-                result += $"[{i}]:{Vertexes[i]}\n";
-            }
-            return result;
-        }
-        /// <summary>
-        /// Return string with all edges in graph.
-        /// </summary>
-        /// <returns></returns>
-        public string GetEdgesAsString()
-        {
-            var result = "";
-            for (var i = 0; i < CountEdges; i++)
-            {
-                result += $"[{i}]:{Edges[i]}\n";
-            }
-            return result;
-        }
-        /// <summary>
-        /// Override method ToString() for graph. Using private method GetGraphMatrix().
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString()
-        {
-            var result = "";
-            var matrix = GetGraphMatrix();
-            for (int i = 0; i < CountVertexes; i++)
-            {
-                for (int j = 0; j < CountVertexes; j++)
-                {
-                    result += $"{matrix[i, j]} ";
-                }
-                result += $"\n";
-            }
-            return result;
-        }
-        /// <summary>
         /// Generate graph as matrix.
         /// </summary>
         /// <returns></returns>
@@ -214,7 +62,7 @@ namespace GraphClassLibrary
         /// <returns></returns>
         private bool CheckVertexInEdge(Edge CheckingEdge, Vertex CheckingVertex)
         {
-            if (CheckingEdge.From == CheckingVertex)
+            if (CheckingEdge.To == CheckingVertex)
             {
                 return true;
             }
@@ -224,31 +72,14 @@ namespace GraphClassLibrary
             }
         }
         /// <summary>
-        /// Returns List of vertexes that connected to current vertex.
-        /// </summary>
-        /// <param name="vertex"></param>
-        /// <returns></returns>
-        private List<Vertex> GetConnectedVertexes(Vertex vertex)
-        {
-            var result = new List<Vertex>();
-            foreach (var edge in Edges)
-            {
-                if (CheckVertexInEdge(edge, vertex))
-                {
-                    result.Add(edge.To);
-                }
-            }
-            return result;
-        }
-        /// <summary>
         /// Returns List of edges that connected to current vertex.
         /// </summary>
         /// <param name="vertex"></param>
         /// <returns></returns>
-        private List<Edge> GetConnectedEdges(Vertex vertex, List<Edge> edges)
+        private List<Edge> GetConnectedEdges(Vertex vertex)
         {
             var result = new List<Edge>();
-            foreach (var edge in edges)
+            foreach (var edge in Edges)
             {
                 if (CheckVertexInEdge(edge, vertex))
                 {
@@ -269,6 +100,141 @@ namespace GraphClassLibrary
                 max += item.Weight;
             }
             return max;
+        }
+        /// <summary>
+        /// Changes numbers of vertexes in graph for search shortest way.
+        /// </summary>
+        /// <param name="number"></param>
+        private void ChangeNumbers(int number)
+        {
+            foreach (var vertex in Vertexes)
+            {
+                if (vertex.Number - number >= 0)
+                {
+                    vertex.Number -= number;
+                }
+                else
+                {
+                    vertex.Number = CountVertexes - number;
+                }
+            }
+        }
+        /// <summary>
+        /// Return numbers of vertexes back to initial values.
+        /// </summary>
+        private void ChangeNumbersBack()
+        {
+            foreach (var vertex in Vertexes)
+            {
+                vertex.Number = vertex.CopyNumber;
+            }
+        }
+        /// <summary>
+        /// Returns all shortest ways from vertex till all others.
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="finish"></param>
+        /// <returns></returns>
+        private WayInGraph GetWay(Vertex start)
+        {
+            var way = new WayInGraph(CountVertexes, GetMaxLength(), start);
+            ChangeNumbers(start.Number);
+            foreach (var vertex in Vertexes)
+            {
+                foreach (var edge in GetConnectedEdges(vertex))
+                {
+                    if (way.MinWayWeights[edge.To.Number] > way.MinWayWeights[edge.From.Number] + edge.Weight)
+                    {
+                        way.MinWayWeights[edge.To.Number] = way.MinWayWeights[edge.From.Number] + edge.Weight;
+                        way.PreviousVertexes[edge.To.Number] = edge.From;
+                    }
+                }
+            }
+            return way;
+        }
+        /// <summary>
+        /// Returns string with shortest way from start to finish if it exists.
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="finish"></param>
+        /// <returns></returns>
+        public string GetWayFromTo(Vertex start, Vertex finish)
+        {
+            var result = $"From[{start.Number}] - To[{finish.Number}]: ";
+            var way = GetWay(start);
+            if (way.MinWayWeights[finish.Number] == GetMaxLength())
+            {
+                result += $"No way from [{start}] to [{finish}]";
+            }
+            else
+            {
+                result += $"Length:{way.MinWayWeights[finish.Number]}; ";
+                foreach (var vertex in way.GetWayFromPreviousVertexes(start, finish))
+                {
+                    result += $"-{vertex}-";
+                }
+            }
+            ChangeNumbersBack();
+            return result;
+        }
+        /// <summary>
+        /// Override method ToString() for graph. Using private method GetGraphMatrix().
+        /// </summary>
+        /// <returns></returns>
+        /// <summary>
+        /// Adding edge to graph, if it still doesn't exist in graph. And adding vertexes FROM and TO if they still doesn't exist in graph. 
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="weight"></param>
+        public void AddEdge(Edge edge)
+        {
+            if (!Edges.Contains(edge))
+            {
+                Edges.Add(edge);
+            }
+            AddVertex(edge.From);
+            AddVertex(edge.To);
+        }
+        /// <summary>
+        /// Return string with all vertexes in graph.
+        /// </summary>
+        /// <returns></returns>
+        public string GetVertexesAsString()
+        {
+            var result = "";
+            for (var i = 0; i < CountVertexes; i++)
+            {
+                result += $"[{i}]:{Vertexes[i]}\n";
+            }
+            return result;
+        }
+        /// <summary>
+        /// Return string with all edges in graph.
+        /// </summary>
+        /// <returns></returns>
+        public string GetEdgesAsString()
+        {
+            var result = "";
+            for (var i = 0; i < CountEdges; i++)
+            {
+                result += $"[{i}]:{Edges[i]}\n";
+            }
+            return result;
+        }
+        public override string ToString()
+        {
+            var result = "";
+            var matrix = GetGraphMatrix();
+            for (int i = 0; i < CountVertexes; i++)
+            {
+                for (int j = 0; j < CountVertexes; j++)
+                {
+                    result += $"{matrix[i, j]} ";
+                }
+                result += $"\n";
+            }
+            return result;
         }
     }
 }
