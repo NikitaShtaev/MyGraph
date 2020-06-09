@@ -1,8 +1,6 @@
 ﻿
 using GraphClassLibrary.Model;
-using System;
 using System.Collections.Generic;
-using System.Drawing;
 
 namespace GraphClassLibrary
 {
@@ -11,11 +9,11 @@ namespace GraphClassLibrary
         /// <summary>
         /// Collection of vertexes in graph.
         /// </summary>
-        private List<Vertex> Vertexes { get; set; }
+        private List<Vertex> Vertexes { get; }
         /// <summary>
         /// Collection of edges on graph.
         /// </summary>
-        private List<Edge> Edges { get; set; }
+        private List<Edge> Edges { get; }
         /// <summary>
         /// Quantity of vertexes in graph.
         /// </summary>
@@ -25,6 +23,7 @@ namespace GraphClassLibrary
         /// </summary>
         private int CountEdges => Edges.Count;
         private decimal MaxLength { get; set; }
+        public AllShortestWaysInGraph AllShortestWays { get; set; }
         /// <summary>
         /// Constructor with initialization of collections of vertexes and edges as new Lists.
         /// </summary>
@@ -33,6 +32,26 @@ namespace GraphClassLibrary
             Vertexes = new List<Vertex>();
             Edges = new List<Edge>();
             MaxLength = 0;
+        }
+        /// <summary>
+        /// Constructor with parameter [List of edges].
+        /// </summary>
+        /// <param name="edges"></param>
+        public MyGraphClass(List<Edge> edges)
+        {
+            Vertexes = new List<Vertex>();
+            Edges = new List<Edge>();
+            foreach (var edge in edges)
+            {
+                if (!Edges.Contains(edge))
+                {
+                    Edges.Add(edge);
+                }
+                AddVertex(edge.From);
+                AddVertex(edge.To);
+                MaxLength += edge.Weight;
+            }
+            AllShortestWays = HelpGetAllShortestWays(); 
         }
         /// <summary>
         /// Generate graph as matrix.
@@ -124,12 +143,31 @@ namespace GraphClassLibrary
             }
         }
         /// <summary>
+        /// Returns all shortest ways in graph.
+        /// </summary>
+        /// <returns></returns>
+        private AllShortestWaysInGraph HelpGetAllShortestWays()
+        {
+            var allWays = new AllShortestWaysInGraph(CountVertexes);
+            for (int i = 0; i < CountVertexes; i++)
+            {
+                for (int j = 0; j < CountVertexes; j++)
+                {
+                    if (i != j)
+                    {
+                        allWays.AddWay(HelpGetWay(Vertexes[i], Vertexes[j]), i, j);
+                    }
+                }
+            }
+            return allWays;
+        }
+        /// <summary>
         /// Returns WAY CLASS for start and finish vertexes.
         /// </summary>
         /// <param name="start"></param>
         /// <param name="finish"></param>
         /// <returns></returns>
-        public Way GetWay(Vertex start, Vertex finish)
+        private Way HelpGetWay(Vertex start, Vertex finish)
         {
             var innerway = new WayInGraph(CountVertexes, MaxLength, start, finish);
             ChangeNumbers(start.Number);
@@ -149,17 +187,31 @@ namespace GraphClassLibrary
             return outway;
         }
         /// <summary>
-        /// Returns WAY CLASS for start and finish vertexes trough another vertex.
+        /// Returns shortest way from start to finish through needed vertex.
         /// </summary>
         /// <param name="start"></param>
         /// <param name="finish"></param>
         /// <param name="trough"></param>
-        /// <returns></returns>
+        /// <returns></returns>        
         public Way GetWayFromToThrough(Vertex start, Vertex finish, Vertex trough)
         {
-            var outway = GetWay(start, trough);
-            outway.IncludeWay(GetWay(trough, finish));
+            var outway = AllShortestWays.AllWays[start.Number, trough.Number];
+            outway.IncludeWay(AllShortestWays.AllWays[trough.Number, finish.Number]);
             return outway;
+        }
+        /// <summary>
+        /// Returns all shortest ways in graph.
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="finish"></param>
+        /// <returns></returns>
+        public Way GetWay(Vertex start, Vertex finish)
+        {
+            return AllShortestWays.AllWays[start.Number, finish.Number];
+        }
+        public AllShortestWaysInGraph GetAllShortestWays()
+        {
+            return AllShortestWays;
         }
         /// <summary>
         /// Adding edge to graph, if it still doesn't exist in graph. And adding vertexes FROM and TO if they still doesn't exist in graph. 
@@ -177,6 +229,7 @@ namespace GraphClassLibrary
             AddVertex(edge.From);
             AddVertex(edge.To);
             MaxLength += edge.Weight;
+            AllShortestWays = HelpGetAllShortestWays();
         }
         /// <summary>
         /// Return string with all vertexes in graph.

@@ -79,20 +79,5 @@ namespace GraphClassLibrary.Model
             }
             return ShortestWay;
         }
-        /// <summary>
-        /// Override to string. Array of min weights.
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString()
-        {
-            //TODO: reapir [ToString()] for WAYINGRAPH class. (ChangeNumbersBack problem).
-            var result = $"From[{Start.CopyNumber}] - ";
-            for (int i = 0; i < MinWayWeights.Length; i++)
-            {
-                if (MinWayWeights[i] != 0 && MinWayWeights[i] != MaxWayLength)
-                result += $"To[{i}]:{MinWayWeights[i]} ";
-            }
-            return result;
-        }
     }
 }
