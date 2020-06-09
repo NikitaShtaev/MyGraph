@@ -130,27 +130,54 @@ namespace GraphClassLibrary
             }
         }
         /// <summary>
-        /// Returns all shortest ways from vertex till all others.
+        /// Returns WAYINGRAPH CLASS for start and finish vertexes.
         /// </summary>
         /// <param name="start"></param>
         /// <param name="finish"></param>
         /// <returns></returns>
-        private WayInGraph GetWay(Vertex start)
+        private WayInGraph GetWay(Vertex start, Vertex finish)
         {
-            var way = new WayInGraph(CountVertexes, GetMaxLength(), start);
+            var innerway = new WayInGraph(CountVertexes, GetMaxLength(), start, finish);
             ChangeNumbers(start.Number);
             foreach (var vertex in Vertexes)
             {
                 foreach (var edge in GetConnectedEdges(vertex))
                 {
-                    if (way.MinWayWeights[edge.To.Number] > way.MinWayWeights[edge.From.Number] + edge.Weight)
+                    if (innerway.MinWayWeights[edge.To.Number] > innerway.MinWayWeights[edge.From.Number] + edge.Weight)
                     {
-                        way.MinWayWeights[edge.To.Number] = way.MinWayWeights[edge.From.Number] + edge.Weight;
-                        way.PreviousVertexes[edge.To.Number] = edge.From;
+                        innerway.MinWayWeights[edge.To.Number] = innerway.MinWayWeights[edge.From.Number] + edge.Weight;
+                        innerway.PreviousVertexes[edge.To.Number] = edge.From;
                     }
                 }
             }
-            return way;
+            innerway.GetWayInGraph();
+            ChangeNumbersBack();
+            return innerway;
+        }
+        /// <summary>
+        /// Returns WAY CLASS for user.
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="finish"></param>
+        /// <returns></returns>
+        private Way GetWayForUser(Vertex start, Vertex finish)
+        {
+            var innerway = new WayInGraph(CountVertexes, GetMaxLength(), start, finish);
+            ChangeNumbers(start.Number);
+            foreach (var vertex in Vertexes)
+            {
+                foreach (var edge in GetConnectedEdges(vertex))
+                {
+                    if (innerway.MinWayWeights[edge.To.Number] > innerway.MinWayWeights[edge.From.Number] + edge.Weight)
+                    {
+                        innerway.MinWayWeights[edge.To.Number] = innerway.MinWayWeights[edge.From.Number] + edge.Weight;
+                        innerway.PreviousVertexes[edge.To.Number] = edge.From;
+                    }
+                }
+            }
+            var outway = innerway.GetWayForUser();
+            ChangeNumbersBack();
+            return outway;
         }
         /// <summary>
         /// Returns string with shortest way from start to finish if it exists.
@@ -158,24 +185,21 @@ namespace GraphClassLibrary
         /// <param name="start"></param>
         /// <param name="finish"></param>
         /// <returns></returns>
-        public string GetWayFromTo(Vertex start, Vertex finish)
+        public string GetWayFromToAsString(Vertex start, Vertex finish)
         {
-            var result = $"From[{start.Number}] - To[{finish.Number}]: ";
-            var way = GetWay(start);
-            if (way.MinWayWeights[finish.Number] == GetMaxLength())
-            {
-                result += $"No way from [{start}] to [{finish}]";
-            }
-            else
-            {
-                result += $"Length:{way.MinWayWeights[finish.Number]}; ";
-                foreach (var vertex in way.GetWayFromPreviousVertexes(start, finish))
-                {
-                    result += $"-{vertex}-";
-                }
-            }
-            ChangeNumbersBack();
-            return result;
+            var outway = GetWayForUser(start, finish);
+            return outway.ToString();
+        }
+        /// <summary>
+        /// Returns shortest way from start to finish. Inside of way info about existance of way as bool.
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="finish"></param>
+        /// <returns></returns>
+        public Way GetWayFromTo(Vertex start, Vertex finish)
+        {
+            var innerway = GetWay(start, finish);
+            return innerway.GetWayForUser();
         }
         /// <summary>
         /// Override method ToString() for graph. Using private method GetGraphMatrix().
@@ -189,6 +213,7 @@ namespace GraphClassLibrary
         /// <param name="weight"></param>
         public void AddEdge(Edge edge)
         {
+            //TODO: check coming data to class MYGRAPH.
             if (!Edges.Contains(edge))
             {
                 Edges.Add(edge);

@@ -8,14 +8,12 @@ namespace GraphClassLibrary
         public int CopyNumber { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
-        public bool IsVisited { get; set; }
         public Vertex(int number, string name)
         {
             //TODO: check coming data for class (VERTEX).
             Number = number;
             CopyNumber = number;
             Name = name;
-            IsVisited = false;
         }
         public Vertex(int number)
         {
@@ -23,13 +21,12 @@ namespace GraphClassLibrary
             Number = number;
             CopyNumber = number;
             Name = number.ToString();
-            IsVisited = false;
         }
         public static bool operator ==(Vertex v1, Vertex v2) => v1.Number == v2.Number;
         public static bool operator !=(Vertex v1, Vertex v2) => !(v1.Number == v2.Number);
         public override string ToString()
         {
-            return $"No({CopyNumber}):{Name}";
+            return $"#{CopyNumber}:{Name}";
         }
 
         public override bool Equals(object obj)

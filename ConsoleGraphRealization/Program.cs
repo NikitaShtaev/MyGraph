@@ -32,7 +32,7 @@ namespace ConsoleGraphRealization
             Console.WriteLine(graph);
 
             Console.WriteLine("=====================");
-            Console.WriteLine(graph.GetWayFromTo(v0, v5));
+            Console.WriteLine(graph.GetWayFromToAsString(v1, v4));
             Console.ReadLine();
         }
         static void AddTwoWayEdgeToGraph(MyGraphClass graph, Vertex v1, Vertex v2, int weight)
