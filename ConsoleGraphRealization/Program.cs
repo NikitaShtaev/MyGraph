@@ -24,13 +24,11 @@ namespace ConsoleGraphRealization
             AddToEdgeList(lst, v3, v2, 2); //6
 
             var graph = new MyGraphClass(lst);
-            Console.WriteLine(graph.GetWay(v1, v3));
-            Console.WriteLine(graph.GetEdgesAsString());
+            Console.WriteLine(graph.GetWay(v0, v3));
             //graph.WriteGraph("TestGraph.json");
             var graph2 = new MyGraphClass();
             graph2 = graph2.ReadGraph("TestGraph.json");
-            Console.WriteLine(graph2.GetEdgesAsString());
-            Console.WriteLine(graph2.GetWay(v1, v3));
+            Console.WriteLine(graph2.GetWay(v0, v3));
             Console.ReadLine();
         }
         static void AddTwoWayEdgeToGraph(MyGraphClass graph, Vertex v1, Vertex v2, int weight)
@@ -42,7 +40,7 @@ namespace ConsoleGraphRealization
         {
             graph.AddEdge(new Edge(v1, v2, weight));
         }
-        static void AddToEdgeList(List<Edge> lst, Vertex v1, Vertex v2, int weight)
+        static void AddToEdgeList(List<Edge> lst, Vertex v1, Vertex v2, decimal weight)
         {
             lst.Add(new Edge(v1, v2, weight));
         }

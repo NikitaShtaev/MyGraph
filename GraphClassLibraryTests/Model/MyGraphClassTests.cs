@@ -75,14 +75,17 @@ namespace GraphClassLibrary.Tests
             graph2 = graph2.ReadGraph("TestGraph.json");
             var correct1 = "From[#1:1] - To[#2:2]: Length:3; -#1:1--#3:3--#2:2-";
             var correct2 = "From[#0:0] - To[#3:3]: Length:4; -#0:0--#2:2--#3:3-";
+            var correct3 = "From[#0:0] - To[#3:3]: Length:2; -#0:0--#1:1--#3:3-";
             //act
             var result1 = graph2.GetWay(v1, v2).ToString();
             var result2 = graph2.GetWayFromToThrough(v0, v3, v2).ToString();
+            var result3 = graph2.GetWay(v0, v3).ToString();
             //asset
             Assert.AreEqual(correct1, result1);
             Assert.AreEqual(correct2, result2);
+            Assert.AreEqual(correct3, result3);
         }
-        static void AddToEdgeList(List<Edge> lst, Vertex v1, Vertex v2, int weight)
+        static void AddToEdgeList(List<Edge> lst, Vertex v1, Vertex v2, decimal weight)
         {
             lst.Add(new Edge(v1, v2, weight));
         }

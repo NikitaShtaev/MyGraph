@@ -317,12 +317,30 @@ namespace GraphClassLibrary
         public MyGraphClass ReadGraph(string path)
         {
             var jsonFormatter = new DataContractJsonSerializer(typeof(List<Edge>));
-            using (var file = new FileStream(path, FileMode.OpenOrCreate))
+            using (var file = new FileStream(path, FileMode.Open))
             {
                 var newEdges = jsonFormatter.ReadObject(file) as List<Edge>;
-                var newGraph = new MyGraphClass(newEdges);
+                var vertexList = new List<Vertex>();
+                var edgeList = new List<Edge>();
+                foreach (var edge in newEdges)
+                {
+                    if(!vertexList.Contains(edge.To))
+                    {
+                        vertexList.Add(new Vertex(edge.To.Number, edge.To.Name));
+                    }
+                    if (!vertexList.Contains(edge.From))
+                    {
+                        vertexList.Add(new Vertex(edge.From.Number, edge.From.Name));
+                    }
+                    AddToEdgeList(edgeList, vertexList.Find(e => e == edge.From), vertexList.Find(e => e == edge.To), edge.Weight);
+                }
+                var newGraph = new MyGraphClass(edgeList);
                 return newGraph;
             }
+        }
+        public void AddToEdgeList(List<Edge> lst, Vertex v1, Vertex v2, decimal weight)
+        {
+            lst.Add(new Edge(v1, v2, weight));
         }
     }
 }
