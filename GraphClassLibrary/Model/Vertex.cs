@@ -1,12 +1,20 @@
 ﻿
+using System.Runtime.Serialization;
+
 namespace GraphClassLibrary
 {
+    [DataContract]
     public class Vertex
     {
+        [DataMember]
         public string Name { get; set; }
+        [DataMember]
         public int Number { get; set; }
+        [DataMember]
         public int CopyNumber { get; set; }
+        [DataMember]
         public int X { get; set; }
+        [DataMember]
         public int Y { get; set; }
         public Vertex(int number, string name)
         {

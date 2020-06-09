@@ -1,4 +1,5 @@
 ﻿
+
 namespace GraphClassLibrary.Model
 {
     public class AllShortestWaysInGraph

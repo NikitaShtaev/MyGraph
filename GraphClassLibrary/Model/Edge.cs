@@ -1,10 +1,16 @@
 ﻿
+using System.Runtime.Serialization;
+
 namespace GraphClassLibrary
 {
+    [DataContract]
     public class Edge
     {
+        [DataMember]
         public Vertex From { get; set; }
+        [DataMember]
         public Vertex To { get; set; }
+        [DataMember]
         public decimal Weight { get; set; }
         public Edge(Vertex from, Vertex to, decimal weight)
         {

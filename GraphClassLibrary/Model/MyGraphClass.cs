@@ -1,27 +1,48 @@
 ﻿
 using GraphClassLibrary.Model;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 
 namespace GraphClassLibrary
 {
+    [DataContract]
     public class MyGraphClass
     {
         /// <summary>
         /// Collection of vertexes in graph.
         /// </summary>
-        private List<Vertex> Vertexes { get; }
+        private List<Vertex> Vertexes { get; set; }
         /// <summary>
         /// Collection of edges on graph.
         /// </summary>
-        private List<Edge> Edges { get; }
+        [DataMember]
+        private List<Edge> Edges { get; set; }
         /// <summary>
         /// Quantity of vertexes in graph.
         /// </summary>
-        private int CountVertexes => Vertexes.Count;
+        private int CountVertexes
+        {
+            get
+            {
+                return Vertexes.Count;
+            }
+            set { }
+            
+        }
         /// <summary>
         /// Quantity of edges in graph.
-        /// </summary>
-        private int CountEdges => Edges.Count;
+        /// </summary> 
+        private int CountEdges
+        {
+            get
+            {
+                return Edges.Count;
+            }
+            set { }
+
+        }
         private decimal MaxLength { get; set; }
         public AllShortestWaysInGraph AllShortestWays { get; set; }
         /// <summary>
@@ -41,6 +62,7 @@ namespace GraphClassLibrary
         {
             Vertexes = new List<Vertex>();
             Edges = new List<Edge>();
+            MaxLength = 0;
             foreach (var edge in edges)
             {
                 if (!Edges.Contains(edge))
@@ -274,6 +296,33 @@ namespace GraphClassLibrary
                 result += $"\n";
             }
             return result;
+        }
+        /// <summary>
+        /// Write down graph to file.
+        /// </summary>
+        /// <param name="path"></param>
+        public void WriteGraph(string path)
+        {
+            var jsonFormatter = new DataContractJsonSerializer(typeof(List<Edge>));
+            using (var file = new FileStream(path,FileMode.Create))
+            {
+                jsonFormatter.WriteObject(file, Edges);
+            }
+        }
+        /// <summary>
+        /// Read out graph from file.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public MyGraphClass ReadGraph(string path)
+        {
+            var jsonFormatter = new DataContractJsonSerializer(typeof(List<Edge>));
+            using (var file = new FileStream(path, FileMode.OpenOrCreate))
+            {
+                var newEdges = jsonFormatter.ReadObject(file) as List<Edge>;
+                var newGraph = new MyGraphClass(newEdges);
+                return newGraph;
+            }
         }
     }
 }
