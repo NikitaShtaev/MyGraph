@@ -26,6 +26,20 @@ namespace GraphClassLibrary.Model
         {
             Vertexes = new List<Vertex>();
         }
+        public void IncludeWay(Way includingWay)
+        {
+            if (includingWay.IsWay)
+            {
+                Length += includingWay.Length;
+                Vertexes.Remove(Vertexes[Vertexes.Count - 1]);
+                Vertexes.AddRange(includingWay.Vertexes);
+            }
+            else
+            {
+                IsWay = false;
+                Vertexes = new List<Vertex>();
+            }
+        }
         public override string ToString()
         {
             var result = "";

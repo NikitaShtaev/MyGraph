@@ -26,17 +26,9 @@ namespace GraphClassLibrary.Model
         /// </summary>
         public Vertex Finish { get; set; }
         /// <summary>
-        /// Length of way in graph.
-        /// </summary>
-        public decimal WayLength { get; set; }
-        /// <summary>
-        /// List of vertexes that contains shortest way.
-        /// </summary>
-        public List<Vertex> ShortestWay { get; set; }
-        /// <summary>
         /// Separately WAY class for user.
         /// </summary>
-        private Way NewWay { get; set; }
+        private Way ShortestWay { get; set; }
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -50,8 +42,7 @@ namespace GraphClassLibrary.Model
             Finish = finish;
             MinWayWeights = new decimal[size];
             PreviousVertexes = new Vertex[size];
-            ShortestWay = new List<Vertex>();
-            NewWay = new Way();
+            ShortestWay = new Way();
             var v1 = new Vertex(0);
             PreviousVertexes[0] = v1;
             MinWayWeights[0] = 0;
@@ -69,42 +60,24 @@ namespace GraphClassLibrary.Model
         {
             if (MinWayWeights[Finish.Number] == MaxWayLength)
             {
-                NewWay.IsWay = false;
-                NewWay.Vertexes = new List<Vertex>();
-                NewWay.Length = MaxWayLength;
+                ShortestWay.IsWay = false;
+                ShortestWay.Vertexes = new List<Vertex>();
+                ShortestWay.Length = MaxWayLength;
             }
             else
             {
-                NewWay.IsWay = true;
+                ShortestWay.IsWay = true;
                 var currentVertex = Finish;
                 while (currentVertex != Start)
                 {
-                    NewWay.Vertexes.Add(currentVertex);
+                    ShortestWay.Vertexes.Add(currentVertex);
                     currentVertex = PreviousVertexes[currentVertex.Number];
                 }
-                NewWay.Vertexes.Add(Start);
-                NewWay.Vertexes.Reverse();
-                NewWay.Length = MinWayWeights[Finish.Number];
+                ShortestWay.Vertexes.Add(Start);
+                ShortestWay.Vertexes.Reverse();
+                ShortestWay.Length = MinWayWeights[Finish.Number];
             }
-            return NewWay;
-        }
-        /// <summary>
-        /// Arrange shortest way.
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="finish"></param>
-        /// <returns></returns>
-        public void GetWayInGraph()
-        {
-            var currentVertex = Finish;
-            while (currentVertex != Start)
-            {
-                ShortestWay.Add(currentVertex);
-                currentVertex = PreviousVertexes[currentVertex.Number];
-            }
-            ShortestWay.Add(Start);
-            ShortestWay.Reverse();
-            WayLength = MinWayWeights[Finish.Number];
+            return ShortestWay;
         }
         /// <summary>
         /// Override to string. Array of min weights.

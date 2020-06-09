@@ -1,6 +1,8 @@
 ﻿
 using GraphClassLibrary.Model;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace GraphClassLibrary
 {
@@ -22,6 +24,7 @@ namespace GraphClassLibrary
         /// Quantity of edges in graph.
         /// </summary>
         private int CountEdges => Edges.Count;
+        private decimal MaxLength { get; set; }
         /// <summary>
         /// Constructor with initialization of collections of vertexes and edges as new Lists.
         /// </summary>
@@ -29,6 +32,7 @@ namespace GraphClassLibrary
         {
             Vertexes = new List<Vertex>();
             Edges = new List<Edge>();
+            MaxLength = 0;
         }
         /// <summary>
         /// Generate graph as matrix.
@@ -62,7 +66,7 @@ namespace GraphClassLibrary
         /// <returns></returns>
         private bool CheckVertexInEdge(Edge CheckingEdge, Vertex CheckingVertex)
         {
-            if (CheckingEdge.To == CheckingVertex)
+            if (CheckingEdge.To == CheckingVertex || CheckingEdge.From == CheckingVertex)
             {
                 return true;
             }
@@ -89,35 +93,25 @@ namespace GraphClassLibrary
             return result;
         }
         /// <summary>
-        /// Returns maximum possible value for way length.
-        /// </summary>
-        /// <returns></returns>
-        private decimal GetMaxLength()
-        {
-            decimal max = 0;
-            foreach (var item in Edges)
-            {
-                max += item.Weight;
-            }
-            return max;
-        }
-        /// <summary>
         /// Changes numbers of vertexes in graph for search shortest way.
         /// </summary>
         /// <param name="number"></param>
         private void ChangeNumbers(int number)
         {
-            foreach (var vertex in Vertexes)
-            {
-                if (vertex.Number - number >= 0)
-                {
-                    vertex.Number -= number;
-                }
-                else
-                {
-                    vertex.Number = CountVertexes - number;
-                }
-            }
+            //foreach (var vertex in Vertexes)
+            //{
+            //    if (vertex.Number - number >= 0)
+            //    {
+            //        vertex.Number -= number;
+            //    }
+            //    else
+            //    {
+            //        vertex.Number = CountVertexes - number;
+            //        //vertex.Number = Math.Abs(vertex.Number - number);
+            //    }
+            //}
+            Vertexes[number].Number = 0;
+            Vertexes[0].Number = number;
         }
         /// <summary>
         /// Return numbers of vertexes back to initial values.
@@ -130,39 +124,14 @@ namespace GraphClassLibrary
             }
         }
         /// <summary>
-        /// Returns WAYINGRAPH CLASS for start and finish vertexes.
+        /// Returns WAY CLASS for start and finish vertexes.
         /// </summary>
         /// <param name="start"></param>
         /// <param name="finish"></param>
         /// <returns></returns>
-        private WayInGraph GetWay(Vertex start, Vertex finish)
+        public Way GetWay(Vertex start, Vertex finish)
         {
-            var innerway = new WayInGraph(CountVertexes, GetMaxLength(), start, finish);
-            ChangeNumbers(start.Number);
-            foreach (var vertex in Vertexes)
-            {
-                foreach (var edge in GetConnectedEdges(vertex))
-                {
-                    if (innerway.MinWayWeights[edge.To.Number] > innerway.MinWayWeights[edge.From.Number] + edge.Weight)
-                    {
-                        innerway.MinWayWeights[edge.To.Number] = innerway.MinWayWeights[edge.From.Number] + edge.Weight;
-                        innerway.PreviousVertexes[edge.To.Number] = edge.From;
-                    }
-                }
-            }
-            innerway.GetWayInGraph();
-            ChangeNumbersBack();
-            return innerway;
-        }
-        /// <summary>
-        /// Returns WAY CLASS for user.
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="finish"></param>
-        /// <returns></returns>
-        private Way GetWayForUser(Vertex start, Vertex finish)
-        {
-            var innerway = new WayInGraph(CountVertexes, GetMaxLength(), start, finish);
+            var innerway = new WayInGraph(CountVertexes, MaxLength, start, finish);
             ChangeNumbers(start.Number);
             foreach (var vertex in Vertexes)
             {
@@ -180,31 +149,18 @@ namespace GraphClassLibrary
             return outway;
         }
         /// <summary>
-        /// Returns string with shortest way from start to finish if it exists.
+        /// Returns WAY CLASS for start and finish vertexes trough another vertex.
         /// </summary>
         /// <param name="start"></param>
         /// <param name="finish"></param>
+        /// <param name="trough"></param>
         /// <returns></returns>
-        public string GetWayFromToAsString(Vertex start, Vertex finish)
+        public Way GetWayFromToThrough(Vertex start, Vertex finish, Vertex trough)
         {
-            var outway = GetWayForUser(start, finish);
-            return outway.ToString();
+            var outway = GetWay(start, trough);
+            outway.IncludeWay(GetWay(trough, finish));
+            return outway;
         }
-        /// <summary>
-        /// Returns shortest way from start to finish. Inside of way info about existance of way as bool.
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="finish"></param>
-        /// <returns></returns>
-        public Way GetWayFromTo(Vertex start, Vertex finish)
-        {
-            var innerway = GetWay(start, finish);
-            return innerway.GetWayForUser();
-        }
-        /// <summary>
-        /// Override method ToString() for graph. Using private method GetGraphMatrix().
-        /// </summary>
-        /// <returns></returns>
         /// <summary>
         /// Adding edge to graph, if it still doesn't exist in graph. And adding vertexes FROM and TO if they still doesn't exist in graph. 
         /// </summary>
@@ -220,6 +176,7 @@ namespace GraphClassLibrary
             }
             AddVertex(edge.From);
             AddVertex(edge.To);
+            MaxLength += edge.Weight;
         }
         /// <summary>
         /// Return string with all vertexes in graph.
@@ -247,6 +204,10 @@ namespace GraphClassLibrary
             }
             return result;
         }
+        /// <summary>
+        /// Override method ToString() for graph. Using private method GetGraphMatrix().
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             var result = "";

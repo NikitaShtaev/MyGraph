@@ -23,16 +23,18 @@ namespace ConsoleGraphRealization
             AddOneWayEdgeToGraph(graph, v1, v2, 6); //4
             AddOneWayEdgeToGraph(graph, v2, v4, 3); //5
             AddOneWayEdgeToGraph(graph, v2, v5, 1); //6
-            AddOneWayEdgeToGraph(graph, v3, v4, 1); //7
+            AddOneWayEdgeToGraph(graph, v3, v4, 2); //7
             AddOneWayEdgeToGraph(graph, v4, v5, 1); //8
-            AddOneWayEdgeToGraph(graph, v5, v4, 4); //9
+            AddOneWayEdgeToGraph(graph, v5, v4, 1); //9
 
             Console.WriteLine(graph.GetVertexesAsString());
             Console.WriteLine(graph.GetEdgesAsString());
             Console.WriteLine(graph);
-
+            Console.WriteLine(graph.GetWay(v2, v3));
+            Console.WriteLine(graph.GetWay(v0, v4));
             Console.WriteLine("=====================");
-            Console.WriteLine(graph.GetWayFromToAsString(v1, v4));
+            
+            Console.WriteLine(graph.GetWayFromToThrough(v0, v3, v2));
             Console.ReadLine();
         }
         static void AddTwoWayEdgeToGraph(MyGraphClass graph, Vertex v1, Vertex v2, int weight)
